@@ -48,7 +48,8 @@
 #' * `c`: for the break in const,
 #' * `t`: for the break in trend,
 #' * `ct`: for the break in const and trend.
-#' @param break.point Array of structural break moments.
+#' * , 'NULL' if there are no breaks
+#' @param break.point Array of structural break moments, 'NULL' if there are no breaks.
 #' @param break.coint Whether breaks in cointegrating relation are needed to be included.
 #' See Carrion-i-Silvestre & Sansó (2006) for details.
 #' @param weakly.exog Boolean where we specify whether the stochastic regressors are exogenous or not
