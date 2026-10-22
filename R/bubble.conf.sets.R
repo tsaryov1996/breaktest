@@ -13,12 +13,6 @@
 #' Both the "estimated" and "true" parameter variants are handled via the `phi_a`, `phi_b`, and `s2` arguments,
 #' which are to be taken from the results of [segments.AR1] or [segments.NBCN] functions.
 #'
-#' @references
-#' Kurozumi, Eiji, Anton Skrobotov, and Alexey Tsarev. 2022.
-#' "Time-Transformed Test for Bubbles under Non-Stationary Volatility".
-#' Journal of Financial Econometrics, advance online publication, 23.
-#' https://doi.org/10.1093/jjfinec/nbac004.
-#'
 #' Kurozumi, Eiji, and Anton Skrobotov. 2026.
 #' "Confidence Sets for the Emergence, Collapse, and Recovery Dates of a Bubble".
 #' arXiv:2511.16172.
