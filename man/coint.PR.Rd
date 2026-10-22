@@ -4,7 +4,7 @@
 \alias{coint.PR}
 \title{A set of residual based tests for cointegration}
 \usage{
-coint.PR(y, x, deter, signif = 0.05)
+coint.PR(y, x, deter, kmax = round(4 * (N/100)^(1/4)), signif = 0.05)
 }
 \arguments{
 \item{y, x}{Variables of interest. \code{x} can be a matrix of several variables.}

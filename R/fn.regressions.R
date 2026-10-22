@@ -8,10 +8,10 @@
 #' @param x Explanatory variables.
 #'
 #' @return A list of:
-#' \item{beta}{estimates of coefficients,}
-#' \item{resid}{estimated residuals,}
-#' \item{predict}{forecasted values,}
-#' \item{t.beta}{\eqn{t}-statistics for `beta`.}
+#' * beta: estimates of coefficients,
+#' * resid: estimated residuals,
+#' * predict: forecasted values,
+#' * t.beta: \eqn{t}-statistics for `beta`.
 #'
 #' @importFrom Rfast rowAll
 #' @importFrom Rfast lmfit
@@ -70,10 +70,10 @@ OLS.reg <- function(y, x) {
 #' @param c A coefficient for \eqn{\rho} calculation.
 #'
 #' @return A list of:
-#' \item{beta}{estimates of coefficients,}
-#' \item{resid}{estimated residuals,}
-#' \item{predict}{forecasted values,}
-#' \item{t.beta}{\eqn{t}-statistics for `beta`.}
+#' * beta: estimates of coefficients,
+#' * resid: estimated residuals,
+#' * predict: forecasted values,
+#' * t.beta: \eqn{t}-statistics for `beta`.
 #'
 #' @keywords internal
 GLS.reg <- function(y, z, c) {
@@ -124,11 +124,11 @@ GLS.reg <- function(y, z, c) {
 #' @param criterion A criterion for lag number estimation.
 #'
 #' @return A list of:
-#' \item{beta}{estimates of coefficients,}
-#' \item{residuals}{estimated residuals,}
-#' \item{predict}{forecasted values,}
-#' \item{t.beta}{\eqn{t}-statistics for `beta`,}
-#' \item{lag}{estimated number of lags.}
+#' * beta: estimates of coefficients,
+#' * residuals: estimated residuals,
+#' * predict: forecasted values,
+#' * t.beta: \eqn{t}-statistics for `beta`,
+#' * lag: estimated number of lags.
 #'
 #' @importFrom Rfast rowAll
 #' @keywords internal
@@ -286,11 +286,11 @@ DOLS.reg <- function(
 #' @param x Explanatory variables.
 #' @param h A bandwidth parameter.
 #' @param kernel Needed kernel, currently only `unif` and `gauss`:
-#' \item{unif}{\eqn{K(x) = \left\{\begin{array}{ll}
+#' * unif: \eqn{K(x) = \left\{\begin{array}{ll}
 #' 1 & \frac{|x - x_i|}{h} \leq 1 \\
 #' 0 & \textrm{otherwize}
-#' \end{array}\right.}}
-#' \item{gauss}{\eqn{\Phi(\frac{x - x_i}{h})}}
+#' \end{array}\right.}
+#' * gauss: \eqn{\Phi(\frac{x - x_i}{h})}
 #'
 #' @return A list of arguments as well as the estimated coefficient vector and
 #' residuals.
@@ -338,11 +338,11 @@ NW.reg <- function(
 #' @param e A series of interest.
 #' @param h A bandwidth parameter.
 #' @param kernel Needed kernel, currently only `unif` and `gauss`:
-#' \item{unif}{\eqn{K(x) = \left\{\begin{array}{ll}
+#' * unif: \eqn{K(x) = \left\{\begin{array}{ll}
 #' 1 & \frac{|x - x_i|}{h} \leq 1 \\
 #' 0 & \textrm{otherwize}
-#' \end{array}\right.}}
-#' \item{gauss}{\eqn{\Phi(\frac{x - x_i}{h})}}
+#' \end{array}\right.}
+#' * gauss: \eqn{\Phi(\frac{x - x_i}{h})}
 #'
 #' @return A list of arguments as well as the estimated omega and s.e.
 #'
@@ -397,11 +397,11 @@ NW.variance <- function(
 #' @param y A dependent variable.
 #' @param x An explanatory variable.
 #' @param kernel Needed kernel, currently only `unif` and `gauss`:
-#' \item{unif}{\eqn{K(x) = \left\{\begin{array}{ll}
+#' * unif: \eqn{K(x) = \left\{\begin{array}{ll}
 #' 1 & \frac{|x - x_i|}{h} \leq 1 \\
 #' 0 & \textrm{otherwize}
-#' \end{array}\right.}}
-#' \item{gauss}{\eqn{\Phi(\frac{x - x_i}{h})}}
+#' \end{array}\right.}
+#' * gauss: \eqn{\Phi(\frac{x - x_i}{h})}
 #'
 #' @references
 #' Harvey, David I., S. Leybourne, Stephen J., and Yang Zu.
@@ -456,18 +456,17 @@ NW.bandwidth <- function(y, x, kernel = "unif") {
 #' @param x A series for kernel calculations.
 #' @param h A bandwidth parameter.
 #' @param kernel Needed kernel, currently only `unif` and `gauss`:
-#' \item{unif}{\eqn{K(x) = \left\{\begin{array}{ll}
+#' * unif: \eqn{K(x) = \left\{\begin{array}{ll}
 #' 1 & \frac{|x - x_i|}{h} \leq 1 \\
 #' 0 & \textrm{otherwize}
-#' \end{array}\right.}}
-#' \item{gauss}{\eqn{\Phi(\frac{x - x_i}{h})}}
+#' \end{array}\right.}
+#' * gauss: \eqn{\Phi(\frac{x - x_i}{h})}
 #'
 #' @importFrom stats pnorm
 #'
 #' @keywords internal
 NW.kernel <- function(i, x, h, kernel = "unif") {
-  switch(
-    kernel,
+  switch(kernel,
     unif = ifelse((abs((x - x[i]) / h) <= 1), 1, 0),
     gauss = pnorm((x - x[i]) / h)
   )

@@ -7,7 +7,7 @@
 MDF.mlt(y, const = FALSE, breaks = 1, breaks.star = 1, trim = 0.15, ZA = FALSE)
 }
 \arguments{
-\item{y}{A time series of interest.}
+\item{y}{a time series of interest.}
 
 \item{const}{Whether the constant term should be included.}
 

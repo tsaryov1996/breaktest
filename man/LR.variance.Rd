@@ -25,26 +25,28 @@
 \item{k}{A limiting parameter for Kurozumi's proposal.}
 
 \item{kernel}{A kernel to be used:
-\item{Truncated}{\eqn{\left\{\begin{array}{ll}
+\itemize{
+\item Truncated: \eqn{\left\{\begin{array}{ll}
 1 & |x| \leq 1 \\
 0 & \textrm{otherwize}
-\end{array}\right.}}
-\item{Bartlett}{\eqn{\left\{\begin{array}{ll}
+\end{array}\right.}
+\item Bartlett: \eqn{\left\{\begin{array}{ll}
 1 - |x| & |x| \leq 1 \\
 0 & \textrm{otherwize}
-\end{array}\right.},}
-\item{Parzen}{\eqn{\left\{\begin{array}{ll}
+\end{array}\right.},
+\item Parzen: \eqn{\left\{\begin{array}{ll}
 1 - 6 x^2 + 6 {|x|}^3 & |x| \leq 1/2 \\
 2 (1 - |x|)^3 & 1/2 \leq |x| \leq 1 \\
 0 & \textrm{otherwize}
-\end{array}\right.},}
-\item{Tukey-Hanning}{\eqn{\left\{\begin{array}{ll}
+\end{array}\right.},
+\item Tukey-Hanning: \eqn{\left\{\begin{array}{ll}
 (1 + \cos(\pi x))/2 & |x| \leq 1 \\
 0 & \textrm{otherwize}
-\end{array}\right.},}
-\item{Quadratic}{\eqn{
+\end{array}\right.},
+\item Quadratic: \eqn{
 \frac{25}{12 \pi^2 x^2}
-\left(\frac{\sin(6 \pi x / 5)}{6 \pi x / 5} - \cos(6 \pi x / 5)\right)}.}}
+\left(\frac{\sin(6 \pi x / 5)}{6 \pi x / 5} - \cos(6 \pi x / 5)\right)}.
+}}
 
 \item{kmax}{A maximum number of lars for recoloring procedure from Sul et al. (2005).}
 

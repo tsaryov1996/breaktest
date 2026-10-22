@@ -34,7 +34,7 @@
 #' https://doi.org/10.1111/ectj.12056.
 #'
 #' @export
-coint.PR <- function(y, x, deter, kmax <- round(4 * (N / 100)^(1 / 4)), signif = 0.05) {
+coint.PR <- function(y, x, deter, kmax = round(4 * (N / 100)^(1 / 4)), signif = 0.05) {
   if (!signif %in% c(0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2)) {
     stop(
       "ERROR! `signif` should be one of (0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2)!"
@@ -53,7 +53,7 @@ coint.PR <- function(y, x, deter, kmax <- round(4 * (N / 100)^(1 / 4)), signif =
 
   opt_cbar <- .cbar_PR[[Nc]][deter]
 
-  
+
 
   zy <- cbind(
     .const(N),

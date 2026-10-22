@@ -27,7 +27,7 @@ A wrapping function around \link{MDF.1br}.
 }
 \references{
 Skrobotov, Anton.
-“Survey on structural breaks and unit root tests.”
-Applied Econometrics 58 (2020): 96–141.
-https://doi.org/10.22394/1993-7601-2020-58-96-141.
+“On Trend Breaks and Initial Condition in Unit Root Testing”
+Journal of Time Series Econometrics, 2018, Issue 1.
+https://doi.org/10.1515/jtse-2016-0014
 }

@@ -4,12 +4,12 @@
 \alias{uroot.robust.mlt}
 \title{A wrapping function around \link{breaktest.KP} and \link{MDF.mlt}.}
 \usage{
-uroot.robust.mlt(y, const = FALSE, season = FALSE, breaks = 2, trim = 0.15)
+uroot.robust.mlt(y, const = TRUE, season = FALSE, breaks = 2, trim = 0.15)
 }
 \arguments{
-\item{y}{A series of interest.}
+\item{y}{a time series of interest.}
 
-\item{const}{Whether the constant term should be included.}
+\item{const}{Whether the constant term is allowed to change (Structural changes in intercept, otherwise Structural changes only in slope).}
 
 \item{season}{Whether the seasonal adjustment is needed.}
 
@@ -23,4 +23,10 @@ A wrapping function around \link{breaktest.KP} and \link{MDF.mlt}.
 \details{
 The code provided is the original Ox code by Skrobotov (2018)
 ported to R.
+}
+\references{
+Skrobotov, Anton.
+“On Trend Breaks and Initial Condition in Unit Root Testing”
+Journal of Time Series Econometrics, 2018, Issue 1.
+https://doi.org/10.1515/jtse-2016-0014
 }

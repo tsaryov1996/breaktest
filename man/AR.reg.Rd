@@ -17,11 +17,13 @@ AR.reg(y, x, max.lag, criterion = "aic")
 }
 \value{
 A list of:
-\item{beta}{estimates of coefficients,}
-\item{residuals}{estimated residuals,}
-\item{predict}{forecasted values,}
-\item{t.beta}{\eqn{t}-statistics for \code{beta},}
-\item{lag}{estimated number of lags.}
+\itemize{
+\item beta: estimates of coefficients,
+\item residuals: estimated residuals,
+\item predict: forecasted values,
+\item t.beta: \eqn{t}-statistics for \code{beta},
+\item lag: estimated number of lags.
+}
 }
 \description{
 Custom AR with extra information

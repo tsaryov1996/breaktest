@@ -7,11 +7,11 @@
 MDF.1br(y, const = FALSE, trend = FALSE, trim = 0.15, criterion = "bic")
 }
 \arguments{
-\item{y}{A time series of interest.}
+\item{y}{time series of interest.}
 
-\item{const}{Whether the constant term should be included.}
+\item{const}{Whether the constant term is allowed to change (Structural change in intercept).}
 
-\item{trend}{Whether the trend term should be included.}
+\item{trend}{Whether the trend term is allowed to change (Structural change in slope).}
 
 \item{trim}{Trimming value for a possible break date bounds.}
 }
