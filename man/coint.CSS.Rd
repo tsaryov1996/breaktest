@@ -36,9 +36,10 @@ If it's NULL then the result of this function is just a KPSS test for y.}
 \item \code{c}: for the break in const,
 \item \code{t}: for the break in trend,
 \item \code{ct}: for the break in const and trend.
+\item , 'NULL' if there are no breaks
 }}
 
-\item{break.point}{Array of structural break moments.}
+\item{break.point}{Array of structural break moments, 'NULL' if there are no breaks.}
 
 \item{break.coint}{Whether breaks in cointegrating relation are needed to be included.
 See Carrion-i-Silvestre & Sansó (2006) for details.}

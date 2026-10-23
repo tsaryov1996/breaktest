@@ -20,15 +20,15 @@
 #' Tc <- unname(estimated_dates["Tc"])
 #' Tr <- unname(estimated_dates["Tr"])
 #' cs_e <- cs.bubble.emerge(
-#'   y = y[seq_len(Tc + 1L)], 
+#'   y = y[seq_len(Tc + 1L)],
 #'   phi_a = fit$phi_a, s2 = fit$s.sq, trim = 0.1
 #' )
 #' cs_c <- cs.bubble.collapse(
-#'   y = y[seq.int(Te + 1L, Tr + 1L)], lambda_e = Te / n, 
+#'   y = y[seq.int(Te + 1L, Tr + 1L)], lambda_e = Te / n,
 #'   phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1
 #' )
 #' cs_r <- cs.bubble.recovery(
-#'   y = y[seq.int(Tc + 1L, n + 1L)], 
+#'   y = y[seq.int(Tc + 1L, n + 1L)],
 #'   lambda_e = Te / n, lambda_c = Tc / n,
 #'   phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1
 #' )
@@ -51,13 +51,12 @@
 #'   date_format = "%Y-%m", x_label = "Date", y_label = "Time series",
 #'   title = "Confidence sets for bubble dates"
 #' )
-#' 
+#'
+#' @references
 #' Kurozumi, Eiji, and Anton Skrobotov. 2026.
 #' "Confidence Sets for the Emergence, Collapse, and Recovery Dates of a Bubble".
 #' arXiv:2511.16172.
 #' Preprint, arXiv. https://doi.org/10.48550/arXiv.2511.16172.
-#' @details
-
 
 #' @rdname bubbles.nbcn
 #' @order 1
