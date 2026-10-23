@@ -13,11 +13,13 @@
 #' Both the "estimated" and "true" parameter variants are handled via the `phi_a`, `phi_b`, and `s2` arguments,
 #' which are to be taken from the results of [segments.AR1] or [segments.NBCN] functions.
 #'
+#' @examples
+#' fit <- segments.NBCN(y, trim = 0.1)
 #' Kurozumi, Eiji, and Anton Skrobotov. 2026.
 #' "Confidence Sets for the Emergence, Collapse, and Recovery Dates of a Bubble".
 #' arXiv:2511.16172.
 #' Preprint, arXiv. https://doi.org/10.48550/arXiv.2511.16172.
-NULL
+#' @details
 
 
 #' @rdname bubbles.nbcn
