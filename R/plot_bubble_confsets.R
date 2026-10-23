@@ -57,8 +57,7 @@
 #'
 #' @references
 #' Kurozumi, E. and Skrobotov, A. (2026). Confidence Sets for the Emergence,
-#' Collapse, and Recovery Dates of a Bubble. Econometric Reviews.
-#' \doi{10.1080/07474938.2026.2700653}.
+#' Collapse, and Recovery Dates of a Bubble. Econometric Reviews, 2026, 45, 1529-1563.
 #'
 #' @seealso [plot_confsets()], [plot_bubble()], [cs.bubble.emerge()]
 #' @examples
