@@ -15,6 +15,43 @@
 #'
 #' @examples
 #' fit <- segments.NBCN(y, trim = 0.1)
+#' estimated_dates <- c(Te = fit$Te_est, Tc = fit$Tc_est, Tr = fit$Tr_est)
+#' Te <- unname(estimated_dates["Te"])
+#' Tc <- unname(estimated_dates["Tc"])
+#' Tr <- unname(estimated_dates["Tr"])
+#' cs_e <- cs.bubble.emerge(
+#'   y = y[seq_len(Tc + 1L)], 
+#'   phi_a = fit$phi_a, s2 = fit$s.sq, trim = 0.1
+#' )
+#' cs_c <- cs.bubble.collapse(
+#'   y = y[seq.int(Te + 1L, Tr + 1L)], lambda_e = Te / n, 
+#'   phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1
+#' )
+#' cs_r <- cs.bubble.recovery(
+#'   y = y[seq.int(Tc + 1L, n + 1L)], 
+#'   lambda_e = Te / n, lambda_c = Tc / n,
+#'   phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1
+#' )
+#' conf_sets <- list(Te = cs_e$cset_LE, Tc = cs_c$cset_EMa, Tr = cs_r$cset_LE)
+#' set_index <- list(
+#'   Te = seq.int(2L, Tc + 1L),
+#'   Tc = seq.int(Te + 2L, Tr + 1L),
+#'   Tr = seq.int(Tc + 2L, n + 1L)
+#' )
+#' break_points <- estimated_dates + 1L
+#' p_bands <- plot_bubble_confsets(
+#'   y, conf_sets = conf_sets, break_points = break_points,
+#'   set_index = set_index, time = dates, shade_phases = TRUE,
+#'   date_format = "%Y-%m", y_label = "Time series",
+#'   title = "Confidence sets for bubble dates"
+#' )
+#' p_rows <- plot_confsets(
+#'   y, conf_sets = conf_sets, break_points = break_points,
+#'   set_index = set_index, time = dates, relative_heights = c(2, 1),
+#'   date_format = "%Y-%m", x_label = "Date", y_label = "Time series",
+#'   title = "Confidence sets for bubble dates"
+#' )
+#' 
 #' Kurozumi, Eiji, and Anton Skrobotov. 2026.
 #' "Confidence Sets for the Emergence, Collapse, and Recovery Dates of a Bubble".
 #' arXiv:2511.16172.
