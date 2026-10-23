@@ -55,8 +55,8 @@
 #' @references
 #' Kurozumi, Eiji, and Anton Skrobotov. 2026.
 #' "Confidence Sets for the Emergence, Collapse, and Recovery Dates of a Bubble".
-#' arXiv:2511.16172.
-#' Preprint, arXiv. https://doi.org/10.48550/arXiv.2511.16172.
+#' Econometric Reviews, 2026, 45, 1529-1563.
+
 
 #' @rdname bubbles.nbcn
 #' @order 1
