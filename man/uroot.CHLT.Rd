@@ -2,36 +2,73 @@
 % Please edit documentation in R/uroot.CHLT.R
 \name{uroot.CHLT}
 \alias{uroot.CHLT}
-\title{MDF test for a single break and possible heteroscedasticity}
+\title{Unit root tests with one or multiple possible trend breaks}
 \usage{
-uroot.CHLT(y, max.lag = NULL, trim = 0.15, boot.cv = FALSE, boot.iter = 999)
+uroot.CHLT(
+  y,
+  max.lag = NULL,
+  trim = 0.15,
+  boot.cv = FALSE,
+  boot.iter = 999,
+  breaks = 1
+)
 }
 \arguments{
 \item{y}{A time series of interest.}
 
 \item{max.lag}{The maximum possible lag.}
 
-\item{trim}{Trimming parameter for lag selection}
+\item{trim}{Trimming fraction for candidate dates; also minimum relative
+spacing between dates in the multiple-break branch.}
 
 \item{boot.cv}{Whether we need bootstrapped critical values.}
 
 \item{boot.iter}{Number of bootstrap iterations.}
+
+\item{breaks}{Number of possible trend breaks: 1 (the original procedure),
+2 or 3 (the minimum-DF procedure). Appended to preserve positional calls.}
 }
 \value{
-An object of type \code{mdfCHLT}. It's a list of four sublists
+An object of class \code{bt_mdfCHLT}. For one break, four sublists
 each containing:
 \itemize{
 \item The value of \eqn{MZ_\alpha}, \eqn{MSB}, \eqn{MZ_t}, or \eqn{ADF},
 \item The asymptotic c.v.,
 \item The bootstrapped c.v.
 }
+For multiple breaks, \code{ADF} contains the GLS minimum t-statistic and
+\code{cv = NA} (single-break asymptotic tables are not reused).
+With \code{boot.cv = TRUE}, \code{ADF$boot.cv} and \code{ADF$p.value} are added.
+\code{params} records the grid settings, minimizing dates (last pre-break rows),
+selected lag and GLS constant. \code{params$bootstrap} contains the second
+differences and simulated statistics. The paper does not define multi-break
+counterparts of MZa, MSB or MZt.
 }
 \description{
-MDF test for a single break and possible heteroscedasticity
+Unit root tests with one or multiple possible trend breaks
 }
 \details{
-The code provided is the original GAUSS code by Cavaliere et al.
-ported to R.
+With \code{breaks = 1}, the original CHLT (2011) procedure and bootstrap are
+retained. With \code{breaks = 2} or \code{3}, the GLS minimum-DF component of
+\code{\link{MDF.mlt}} is used, with wild bootstrap Algorithm 1 in Cavaliere et al.
+(January 2014), Sections 3 and 5.1. This is a trend-slope-break model:
+the deterministic regressors are a constant, a trend and one hinge per break.
+
+The original-sample lag is selected by OLS-MAIC for each candidate date
+configuration, as in \code{MDF.mlt}. The grid spans \code{floor(trim * N)} through
+\code{floor((1 - trim) * N)}, with spacing at least \code{floor(trim * N)}.
+The GLS localizing constants 21.5 and 25.5 are inherited from \code{MDF.mlt}.
+Only the requested number of candidate breaks is searched; their
+coefficients may be zero. This does not estimate the number of breaks.
+
+For multiple breaks, bootstrap innovations are independent standard normal
+multipliers times the second differences of \code{y}, with the first two
+innovations zero. Each bootstrap series is their cumulative sum. The full
+date search is repeated with zero ADF lags. The p-value is the fraction of
+bootstrap minima at or below the observed minimum (Remark 9 of the paper).
+The 5\% critical value is the empirical quantile (\code{type = 1}). No fitted
+broken trend is added to the bootstrap series. Exhaustive search can be
+costly, especially for three breaks and long series.
 }
 \references{
 Cavaliere, Giuseppe, David I. Harvey, Stephen J. Leybourne,
@@ -40,4 +77,14 @@ and A.M. Robert Taylor.
 Nonstationary Volatility.”
 Econometric Theory 27, no. 5 (October 2011): 957–91.
 https://doi.org/10.1017/S0266466610000605.
+
+Cavaliere, G., Harvey, D. I., Leybourne, S. J. and Taylor, A. M. R.
+(January 2014). "Testing for Unit Roots Under Multiple Possible Trend
+Breaks and Non-Stationary Volatility Using Bootstrap Minimum Dickey-Fuller
+Statistics", Sections 3 and 5.1, Algorithm 1 and Remark 9.
+}
+\examples{
+set.seed(73)
+y <- cumsum(rnorm(40)) + 0.3 * pmax(seq_len(40) - 15, 0)
+uroot.CHLT(y, max.lag = 1, breaks = 2)
 }

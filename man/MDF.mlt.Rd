@@ -4,12 +4,22 @@
 \alias{MDF.mlt}
 \title{MDF procedure for multiple unknown breaks.}
 \usage{
-MDF.mlt(y, const = FALSE, breaks = 1, breaks.star = 1, trim = 0.15, ZA = FALSE)
+MDF.mlt(
+  y,
+  const = FALSE,
+  breaks = 1,
+  breaks.star = 1,
+  trim = 0.15,
+  ZA = FALSE,
+  max.lag = NULL,
+  gls.only = FALSE
+)
 }
 \arguments{
 \item{y}{a time series of interest.}
 
-\item{const}{Whether the constant term should be included.}
+\item{const}{Whether level shifts accompany the trend breaks. The
+deterministic regression always includes a constant and a linear trend.}
 
 \item{breaks}{Number of breaks.}
 
@@ -18,6 +28,13 @@ MDF.mlt(y, const = FALSE, breaks = 1, breaks.star = 1, trim = 0.15, ZA = FALSE)
 \item{trim}{Trimming value for a possible break date bounds.}
 
 \item{ZA}{Whether ZA variant should be used.}
+
+\item{max.lag}{Maximum ADF lag. NULL retains the original sample-size rule.}
+
+\item{gls.only}{If TRUE, compute only the GLS minimum for exactly \code{breaks}
+candidate trend breaks, without OLS/union statistics or asymptotic tables.
+Requires \code{const = FALSE} and \code{ZA = FALSE}. This component is used by
+\code{\link{uroot.CHLT}} for the multiple-break wild bootstrap procedure.}
 }
 \value{
 A list of sublists each containing
@@ -26,6 +43,9 @@ A list of sublists each containing
 \item The asymptotic critical values.
 \eqn{UR} values are included as well.
 }
+With \code{gls.only = TRUE}, returns \code{statistic}, \code{break.points},
+\code{lag}, the candidate \code{grid}, positive \code{cbar}, \code{max.lag}
+and \code{n.obs} instead.
 }
 \description{
 MDF procedure for multiple unknown breaks.

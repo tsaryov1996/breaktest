@@ -32,6 +32,8 @@ bootstrap(obj, ...)
 
 \item{iter}{Number of bootstrapping iterations.}
 
+\item{y}{Original series, required for \code{bt_mdfCHLT} objects.}
+
 \item{boot.type}{Type of bootstrapping:
 \itemize{
 \item{"sample"}{sampling from residuals with replacement,}
@@ -52,4 +54,11 @@ Normally one should use special function parameters to obtain bootstrapped criti
 p-values (depends on test).
 If later you decide to calculate one then you call \code{bootstrap} function on the object
 with corresponding results.
+
+For \code{uroot.CHLT(..., breaks = 2)} or \code{3}, uses the second-difference
+wild bootstrap of Algorithm 1 in Cavaliere et al. (January 2014), repeating
+the complete date search with zero ADF lags. Returns \code{ADF} (the empirical
+5\% critical value), \code{p.value}, \code{iterations}, \code{difference.order},
+\code{lag}, \code{innovations} and \code{statistics}. The one-break bootstrap
+is unchanged.
 }
