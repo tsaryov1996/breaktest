@@ -296,6 +296,20 @@ print.bt_confSet <- function(obj, ...) {
 #' @keywords internal
 #' @exportS3Method
 print.bt_mdfCHLT <- function(obj, ...) {
+  if (identical(obj$params$method, "CHLT2014-MDF")) {
+    cat("GLS minimum-DF test with", obj$params$breaks,
+        "possible trend breaks (CHLT, January 2014)\n")
+    cat("Minimizing break dates:", obj$params$break.points, "\n")
+    cat(sprintf("ADF: %.6f\n", obj$ADF$statistic))
+    if (!is.null(obj$ADF$boot.cv)) {
+      cat(sprintf("Bootstrap 5%% critical value: %.6f; p-value: %.6f\n",
+                  obj$ADF$boot.cv, obj$ADF$p.value))
+    } else {
+      cat("Use boot.cv = TRUE or bootstrap() for critical values and p-values.\n")
+    }
+    return(invisible(obj))
+  }
+
   cat(
     "A modified DF test for a single break",
     "and possible heteroscedasticity",

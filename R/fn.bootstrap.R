@@ -165,8 +165,18 @@ bootstrap.bt_GSADF <- function(obj, iter = 999) {
 
 
 #' @rdname bootstrap
+#' @param y Original series, required for `bt_mdfCHLT` objects.
+#' @details For `uroot.CHLT(..., breaks = 2)` or `3`, uses the second-difference
+#' wild bootstrap of Algorithm 1 in Cavaliere et al. (January 2014), repeating
+#' the complete date search with zero ADF lags. Returns `ADF` (the empirical
+#' 5% critical value), `p.value`, `iterations`, `difference.order`, `lag`,
+#' `innovations` and `statistics`. The one-break bootstrap is unchanged.
 #' @exportS3Method
 bootstrap.bt_mdfCHLT <- function(obj, iter = 999, y) {
+  if (identical(obj$params$method, "CHLT2014-MDF")) {
+    return(.chlt.bootstrap.multiple(obj, iter, y))
+  }
+
   N <- length(y)
   dy <- diff(y)
 

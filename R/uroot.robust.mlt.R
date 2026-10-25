@@ -74,24 +74,49 @@ uroot.robust.mlt <- function(
 #' ported to R.
 #'
 #' @param y a time series of interest.
-#' @param const Whether the constant term should be included.
+#' @param const Whether level shifts accompany the trend breaks. The
+#' deterministic regression always includes a constant and a linear trend.
 #' @param breaks Number of breaks.
 #' @param breaks.star Number of breaks got from the Kejrival-Perron procedure.
 #' @param trim Trimming value for a possible break date bounds.
 #' @param ZA Whether ZA variant should be used.
+#' @param max.lag Maximum ADF lag. NULL retains the original sample-size rule.
+#' @param gls.only If TRUE, compute only the GLS minimum for exactly `breaks`
+#' candidate trend breaks, without OLS/union statistics or asymptotic tables.
+#' Requires `const = FALSE` and `ZA = FALSE`. This component is used by
+#' [uroot.CHLT] for the multiple-break wild bootstrap procedure.
 #'
 #' @return A list of sublists each containing
 #' * The value of statistic: \eqn{MDF-GLS}, \eqn{MDF-OLS},
 #' * The asymptotic critical values.
 #' \eqn{UR} values are included as well.
+#' With `gls.only = TRUE`, returns `statistic`, `break.points`, `lag`, the
+#' candidate `grid`, positive `cbar`, `max.lag` and `n.obs` instead.
 MDF.mlt <- function(
   y,
   const = FALSE,
   breaks = 1,
   breaks.star = 1,
   trim = 0.15,
-  ZA = FALSE
+  ZA = FALSE,
+  max.lag = NULL,
+  gls.only = FALSE
 ) {
+  if (!is.logical(gls.only) || length(gls.only) != 1L || is.na(gls.only)) {
+    stop("gls.only must be TRUE or FALSE")
+  }
+  if (gls.only) {
+    if (!identical(const, FALSE) || !identical(ZA, FALSE)) {
+      stop("gls.only requires const = FALSE and ZA = FALSE")
+    }
+    checked <- .chlt.validate(y, max.lag, trim, breaks)
+    grid <- .chlt.break.grid(nrow(checked$y), breaks, trim)
+    cbar <- c(17.6, 21.5, 25.5)[breaks]
+    fit <- .chlt.mdf.scan(checked$y, grid, cbar, checked$max.lag)
+    return(c(fit, list(grid = grid, cbar = cbar, max.lag = checked$max.lag,
+                       n.obs = nrow(checked$y))))
+  }
+
   if (!is.matrix(y)) {
     y <- as.matrix(y)
   }
@@ -127,7 +152,8 @@ MDF.mlt <- function(
   sap.cv.ur.3 <- .cval_MDF_multiple[[model]]$sap.cv.ur.3
 
   ## Start ##
-  kmax <- trunc(12 * (N / 100)^(1 / 4))
+  kmax <- if (is.null(max.lag)) trunc(12 * (N / 100)^(1 / 4)) else
+    .chlt.max.lag(N, max.lag)
 
   tb_L <- trunc(trim * N)
   sep <- tb_L
