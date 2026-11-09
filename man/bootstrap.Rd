@@ -56,7 +56,7 @@ If later you decide to calculate one then you call \code{bootstrap} function on 
 with corresponding results.
 
 For \code{uroot.CHLT(..., breaks = 2)} or \code{3}, uses the second-difference
-wild bootstrap of Algorithm 1 in Cavaliere et al. (January 2014), repeating
+wild bootstrap of Algorithm 1 in Cavaliere et al. (2015), repeating
 the complete date search with zero ADF lags. Returns \code{ADF} (the empirical
 5\% critical value), \code{p.value}, \code{iterations}, \code{difference.order},
 \code{lag}, \code{innovations} and \code{statistics}. The one-break bootstrap

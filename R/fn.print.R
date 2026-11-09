@@ -296,9 +296,11 @@ print.bt_confSet <- function(obj, ...) {
 #' @keywords internal
 #' @exportS3Method
 print.bt_mdfCHLT <- function(obj, ...) {
-  if (identical(obj$params$method, "CHLT2014-MDF")) {
+  # Accept the pre-publication tag in previously saved multiple-break objects.
+  if (identical(obj$params$method, "CHLT2015-MDF") ||
+      identical(obj$params$method, "CHLT2014-MDF")) {
     cat("GLS minimum-DF test with", obj$params$breaks,
-        "possible trend breaks (CHLT, January 2014)\n")
+        "possible trend breaks (CHLT, 2015)\n")
     cat("Minimizing break dates:", obj$params$break.points, "\n")
     cat(sprintf("ADF: %.6f\n", obj$ADF$statistic))
     if (!is.null(obj$ADF$boot.cv)) {

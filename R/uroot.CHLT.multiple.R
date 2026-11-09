@@ -1,4 +1,4 @@
-# Internal implementation of CHLT (January 2014), Algorithm 1 (double-difference wild
+# Internal implementation of CHLT (2015), Algorithm 1 (double-difference wild
 # bootstrap). The original sample uses the OLS-MAIC convention of MDF.mlt;
 # bootstrap samples use unaugmented DF statistics, as required by Algorithm 1.
 # This is the infimum over exactly m candidate trend hinges, allowing their
@@ -152,7 +152,7 @@
   N <- fit$n.obs
   result <- list(
     ADF = list(statistic = fit$statistic[1L], cv = NA_real_),
-    params = list(method = "CHLT2014-MDF", breaks = breaks,
+    params = list(method = "CHLT2015-MDF", breaks = breaks,
                   n.obs = N, trim = trim, separation = floor(trim * N),
                   max.lag = fit$max.lag, lag = fit$lag[1L],
                   break.points = unname(fit$break.points[1L, ]),

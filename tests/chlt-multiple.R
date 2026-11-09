@@ -111,7 +111,7 @@ for (m in 2:3) {
     equal(obj$params$breaks, m, paste(label, "requested break count"), 0)
     equal(obj$params$max.lag, max_lag, paste(label, "maximum lag"), 0)
     check(inherits(obj, "bt_mdfCHLT"), paste(label, "S3 class"))
-    check(identical(obj$params$method, "CHLT2014-MDF"), paste(label, "method"))
+    check(identical(obj$params$method, "CHLT2015-MDF"), paste(label, "method"))
     check(length(obj$ADF$cv) == 1L && is.na(obj$ADF$cv),
           paste(label, "no single-break critical value"))
 
@@ -195,9 +195,23 @@ equal(deferred$statistics, inline$params$bootstrap$statistics,
       "standalone/integrated bootstrap statistics", 0)
 equal(deferred$innovations, inline$params$bootstrap$innovations,
       "standalone/integrated bootstrap innovations", 0)
+# Saved objects from the earlier manuscript-based implementation remain usable.
+legacy_multiple <- plain
+legacy_multiple$params$method <- "CHLT2014-MDF"
+set.seed(seed)
+legacy_deferred <- bootstrap(legacy_multiple, iter = b, y = y)
+check(identical(legacy_deferred, deferred),
+      "legacy multiple-break method tag retains bootstrap results")
+equal(.Random.seed, boot_ref$rng,
+      "legacy multiple-break method tag retains bootstrap RNG", 0)
 for (obj in list(plain, inline, inline3)) {
   printed <- capture.output(print(obj))
   check(length(printed) > 0L, "multiple-break print dispatch")
+  check(any(grepl("(CHLT, 2015)", printed, fixed = TRUE)),
+        "multiple-break output cites the published article")
+  obj$params$method <- "CHLT2014-MDF"
+  check(identical(capture.output(print(obj)), printed),
+        "legacy multiple-break method tag retains print dispatch")
 }
 fails(bootstrap(plain, iter = b, y = y[-1L]), "bootstrap rejects wrong data length")
 fails(bootstrap(plain, iter = 0L, y = y), "bootstrap rejects zero iterations")

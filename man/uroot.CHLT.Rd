@@ -18,15 +18,14 @@ uroot.CHLT(
 
 \item{max.lag}{The maximum possible lag.}
 
-\item{trim}{Trimming fraction for candidate dates; also minimum relative
-spacing between dates in the multiple-break branch.}
+\item{trim}{Trimming fraction for candidate dates and minimum fraction of
+the sample between breaks.}
 
 \item{boot.cv}{Whether we need bootstrapped critical values.}
 
 \item{boot.iter}{Number of bootstrap iterations.}
 
-\item{breaks}{Number of possible trend breaks: 1 (the original procedure),
-2 or 3 (the minimum-DF procedure). Appended to preserve positional calls.}
+\item{breaks}{Number of possible trend breaks.}
 }
 \value{
 An object of class \code{bt_mdfCHLT}. For one break, four sublists
@@ -51,8 +50,15 @@ Unit root tests with one or multiple possible trend breaks
 With \code{breaks = 1}, the original CHLT (2011) procedure and bootstrap are
 retained. With \code{breaks = 2} or \code{3}, the GLS minimum-DF component of
 \code{\link{MDF.mlt}} is used, with wild bootstrap Algorithm 1 in Cavaliere et al.
-(January 2014), Sections 3 and 5.1. This is a trend-slope-break model:
-the deterministic regressors are a constant, a trend and one hinge per break.
+(2015), Sections 3 and 5.1. The deterministic regressors are a constant
+and a possibly broken linear trend, with one slope-change term per break.
+
+Simultaneous level shifts are allowed by the large-sample theory in
+Section 2, footnote 1, of Cavaliere et al. (2015), without additional GLS
+regressors or bootstrap modifications. The implementation does not include
+explicit level-shift indicators or estimate level-shift sizes. This
+asymptotic result does not imply that finite-sample statistics are invariant
+to adding level shifts.
 
 The original-sample lag is selected by OLS-MAIC for each candidate date
 configuration, as in \code{MDF.mlt}. The grid spans \code{floor(trim * N)} through
@@ -78,10 +84,11 @@ Nonstationary Volatility.”
 Econometric Theory 27, no. 5 (October 2011): 957–91.
 https://doi.org/10.1017/S0266466610000605.
 
-Cavaliere, G., Harvey, D. I., Leybourne, S. J. and Taylor, A. M. R.
-(January 2014). "Testing for Unit Roots Under Multiple Possible Trend
-Breaks and Non-Stationary Volatility Using Bootstrap Minimum Dickey-Fuller
-Statistics", Sections 3 and 5.1, Algorithm 1 and Remark 9.
+Cavaliere, G., Harvey, D. I., Leybourne, S. J., and Robert Taylor, A. M.
+(2015). "Testing for Unit Roots Under Multiple Possible Trend Breaks and
+Non-Stationary Volatility Using Bootstrap Minimum Dickey-Fuller Statistics."
+Journal of Time Series Analysis, 36(5), 603-629.
+\doi{10.1111/jtsa.12067}.
 }
 \examples{
 set.seed(73)
