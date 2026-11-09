@@ -7,30 +7,64 @@
 #' @param lambda_e Scalar, fraction for critical value scaling.
 #' @param lambda_c  Scalar lambda_c = Tc / T_yall.
 #' @param s2     Residual variance.
-#' @param trim   Trimming parameter to exclude observations from breakpoint candidates.
+#' @param trim For confidence sets, the minimum separation between comparison
+#' dates as a fraction of the retained window length. For `segments.AR1` and
+#' `segments.NBCN`, the candidate-breakpoint trimming fraction.
+#' This is distinct from `trim_endpoints`.
+#' @param trim_endpoints Logical; apply the additional 5 percent trimming of
+#' estimated regime endpoints from Section 4 of Kurozumi and Skrobotov (2026).
+#' Defaults to `FALSE`, preserving untrimmed calculations. Supply the original,
+#' untrimmed two-regime window, including its initial lag observation.
 #'
 #' @details
 #' Both the "estimated" and "true" parameter variants are handled via the `phi_a`, `phi_b`, and `s2` arguments,
 #' which are to be taken from the results of [segments.AR1] or [segments.NBCN] functions.
 #'
+#' Supply the original two-regime window with its initial lag observation:
+#' `y[1:(Tc + 1)]` for emergence, `y[(Te + 1):(Tr + 1)]` for collapse,
+#' and `y[(Tc + 1):(T + 1)]` for recovery, where `y[1]` is `y0`.
+#'
+#' With `trim_endpoints = TRUE`, `k = floor(0.05 * (length(y) - 1))`
+#' dates are removed from the right (emergence), both ends (collapse), or
+#' the left (recovery). The preceding lag observation is kept, and the
+#' statistics are recomputed on the retained window. Use `FALSE` for known
+#' regime endpoints; do not trim the input manually as well.
+#'
+#' Returned vectors keep their original lengths and indices, with zeros at
+#' excluded dates. Existing plotting `set_index` mappings therefore still apply.
+#' Phase-duration powers keep their original time origin. As in the untrimmed
+#' implementation, asymptotic scale factors use the original input-window length
+#' rather than a separately supplied full-sample length.
+#'
 #' @examples
-#' fit <- segments.NBCN(y, trim = 0.1)
+#' set.seed(42)
+#' n <- 160L
+#' y <- numeric(n + 1L)
+#' y[1L] <- 10
+#' ar <- rep(c(1, 1.06, 0.94, 1), each = n / 4L)
+#' for (t in seq_len(n)) y[t + 1L] <- ar[t] * y[t] + rnorm(1)
+#' dates <- seq(as.Date("2000-01-01"), by = "day", length.out = n + 1L)
+#' trim_estimated_endpoints <- TRUE # FALSE gives the original windows
+#' fit <- breaktest:::segments.NBCN(y, trim = 0.1)
 #' estimated_dates <- c(Te = fit$Te_est, Tc = fit$Tc_est, Tr = fit$Tr_est)
 #' Te <- unname(estimated_dates["Te"])
 #' Tc <- unname(estimated_dates["Tc"])
 #' Tr <- unname(estimated_dates["Tr"])
 #' cs_e <- cs.bubble.emerge(
 #'   y = y[seq_len(Tc + 1L)],
-#'   phi_a = fit$phi_a, s2 = fit$s.sq, trim = 0.1
+#'   phi_a = fit$phi_a, s2 = fit$s.sq, trim = 0.1,
+#'   trim_endpoints = trim_estimated_endpoints
 #' )
 #' cs_c <- cs.bubble.collapse(
 #'   y = y[seq.int(Te + 1L, Tr + 1L)], lambda_e = Te / n,
-#'   phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1
+#'   phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1,
+#'   trim_endpoints = trim_estimated_endpoints
 #' )
 #' cs_r <- cs.bubble.recovery(
 #'   y = y[seq.int(Tc + 1L, n + 1L)],
 #'   lambda_e = Te / n, lambda_c = Tc / n,
-#'   phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1
+#'   phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1,
+#'   trim_endpoints = trim_estimated_endpoints
 #' )
 #' conf_sets <- list(Te = cs_e$cset_LE, Tc = cs_c$cset_EMa, Tr = cs_r$cset_LE)
 #' set_index <- list(
@@ -56,6 +90,7 @@
 #' Kurozumi, Eiji, and Anton Skrobotov. 2026.
 #' "Confidence Sets for the Emergence, Collapse, and Recovery Dates of a Bubble".
 #' Econometric Reviews, 2026, 45, 1529-1563.
+#' Section 4: \url{https://arxiv.org/html/2511.16172v2#S4}.
 
 
 #' @rdname bubbles.nbcn
@@ -66,9 +101,12 @@ cs.bubble.emerge <- function(
   y,
   phi_a,
   s2,
-  trim = 0.1
+  trim = 0.1,
+  trim_endpoints = FALSE
 ) {
-  y <- as.matrix(y)
+  window <- .bubble.trim.window(y, trim, trim_endpoints, "emerge")
+  y <- window$y
+  original_N <- window$original_N
 
   N <- length(y) - 1
   Teps <- max(1L, floor(N * trim))
@@ -106,15 +144,15 @@ cs.bubble.emerge <- function(
     T2_LRb <- ind_minLRb + T1 + Teps - 1
 
     EMb_stat <- min(tstat) /
-      sqrt(abs(rho_a) * phi_a^(2 * (T2_EM - T1)) * N / 2)
+      sqrt(abs(rho_a) * phi_a^(2 * (T2_EM - T1)) * original_N / 2)
     EMa_stat <- sum(tstat) /
-      sqrt(abs(phi_a^(2 * (N - T1 + 1)) * N / 2 / rho_a))
-    LRa_stat <- min(statLRa) / (N * phi_a^(2 * (T2_LR - T1)) / 2)
-    LRb_stat <- min(statLRb) / (N * phi_a^(2 * (T2_LRb - T1)) / 2)
+      sqrt(abs(phi_a^(2 * (N - T1 + 1)) * original_N / 2 / rho_a))
+    LRa_stat <- min(statLRa) / (original_N * phi_a^(2 * (T2_LR - T1)) / 2)
+    LRb_stat <- min(statLRb) / (original_N * phi_a^(2 * (T2_LRb - T1)) / 2)
 
-    cval_EM12 <- get.cv.emergence(T1, T2_EM, N, (T1 - 1) / N)
-    cval_LRa <- get.cv.emergence(T1, T2_LR, N)
-    cval_LRb <- get.cv.emergence(T1, T2_LRb, N)
+    cval_EM12 <- get.cv.emergence(T1, T2_EM, original_N, (T1 - 1) / original_N)
+    cval_LRa <- get.cv.emergence(T1, T2_LR, original_N)
+    cval_LRb <- get.cv.emergence(T1, T2_LRb, original_N)
 
     cset_EMa12[T1 - 1] <- as.integer(EMa_stat > cval_EM12)
     cset_EMb12[T1 - 1] <- as.integer(EMb_stat > cval_EM12)
@@ -147,7 +185,7 @@ cs.bubble.emerge <- function(
     cset_LRa21[T1 - 1] <- as.integer(LR_stat < cval_LR21)
   }
 
-  list(
+  sets <- list(
     cset_EMa = pmin(cset_EMa12, cset_EMa21),
     cset_EMb = pmin(cset_EMb12, cset_EMb21),
     cset_LRa = pmin(cset_LRa12, cset_LRa21),
@@ -162,6 +200,7 @@ cs.bubble.emerge <- function(
     cset_LRa21 = cset_LRa21,
     cset_LE21 = cset_EMa21
   )
+  .bubble.pad.sets(sets, window)
 }
 
 
@@ -174,11 +213,12 @@ cs.bubble.collapse <- function(
   phi_a,
   phi_b,
   s2,
-  trim = 0.1
+  trim = 0.1,
+  trim_endpoints = FALSE
 ) {
-  if (!is.matrix(y)) {
-    y <- as.matrix(y)
-  }
+  window <- .bubble.trim.window(y, trim, trim_endpoints, "collapse")
+  y <- window$y
+  original_N <- window$original_N
 
   N <- length(y) - 1
   Teps <- max(1L, floor(N * trim))
@@ -214,8 +254,9 @@ cs.bubble.collapse <- function(
       statLR[k] <- (2 * rv$S_y1dy + (2 - phi_a - phi_b) * rv$S_yL2) / s2
     }
 
-    scale_EM <- sqrt(N * phi_a^(2 * (T1 - 1)) * abs(rho_b) / 2)
-    scale_LR <- N * (phi_a - phi_b) * phi_a^(2 * (T1 - 1)) / (2 * rho_b)
+    phase_power <- phi_a^(2 * (window$left + T1 - 1))
+    scale_EM <- sqrt(original_N * phase_power * abs(rho_b) / 2)
+    scale_LR <- original_N * (phi_a - phi_b) * phase_power / (2 * rho_b)
 
     cset_EMa12[T1 - 1] <- as.integer(mean(tstat) / scale_EM < cval_EM_lt)
     cset_EMb12[T1 - 1] <- as.integer(max(tstat) / scale_EM < cval_EM_lt)
@@ -234,8 +275,9 @@ cs.bubble.collapse <- function(
       statLR[k] <- (2 * rv$S_y1dy + (2 - phi_a - phi_b) * rv$S_yL2) / s2
     }
 
-    scale_EM <- sqrt(N * phi_a^(2 * (T1 - 1)) * abs(rho_a) / 2)
-    scale_LR <- N * (phi_a - phi_b) * phi_a^(2 * (T1 - 1)) / (2 * rho_a)
+    phase_power <- phi_a^(2 * (window$left + T1 - 1))
+    scale_EM <- sqrt(original_N * phase_power * abs(rho_a) / 2)
+    scale_LR <- original_N * (phi_a - phi_b) * phase_power / (2 * rho_a)
 
     idx <- T1 - 1
     cset_EMa21[idx] <- as.integer(mean(tstat) / scale_EM > cval_EM_gt)
@@ -243,7 +285,7 @@ cs.bubble.collapse <- function(
     cset_LRa21[idx] <- as.integer(min(statLR) / scale_LR > cval_LR_gt)
   }
 
-  list(
+  sets <- list(
     cset_EMa = pmin(cset_EMa12, cset_EMa21),
     cset_EMb = pmin(cset_EMb12, cset_EMb21),
     cset_LRa = pmin(cset_LRa12, cset_LRa21),
@@ -254,6 +296,7 @@ cs.bubble.collapse <- function(
     cset_EMb21 = cset_EMb21,
     cset_LRa21 = cset_LRa21
   )
+  .bubble.pad.sets(sets, window)
 }
 
 #' @rdname bubbles.nbcn
@@ -266,15 +309,18 @@ cs.bubble.recovery <- function(
   phi_a,
   phi_b,
   s2,
-  trim = 0.1
+  trim = 0.1,
+  trim_endpoints = FALSE
 ) {
-  y <- as.matrix(y)
+  window <- .bubble.trim.window(y, trim, trim_endpoints, "recovery")
+  y <- window$y
+  original_N <- window$original_N
 
   N <- length(y) - 1
   Teps <- max(1L, floor(N * trim))
   rho_b <- 1 - phi_b
 
-  exp_ac <- floor(N * (lambda_c - lambda_e))
+  exp_ac <- floor(original_N * (lambda_c - lambda_e))
 
   cset_LRa12 <- integer(N)
   cset_EMa12s <- integer(N)
@@ -298,11 +344,11 @@ cs.bubble.recovery <- function(
 
     ind_minLR <- which.min(statLR)
     T2_LR <- ind_minLR + T1 + Teps - 1
-    scale_LRa <- N *
+    scale_LRa <- original_N *
       (T2_LR - T1) *
       rho_b *
       phi_a^(2 * exp_ac) *
-      phi_b^(2 * (T1 - 1))
+      phi_b^(2 * (window$left + T1 - 1))
 
     LRa_stat <- min(statLR) / scale_LRa
     EMas_stat <- sum(tstat) / N
@@ -338,12 +384,15 @@ cs.bubble.recovery <- function(
     ind_maxEM <- which.max(tstat)
     T2_EM <- ind_maxEM + Teps
 
-    scale_LRa <- phi_a^(2 * exp_ac) * phi_b^(2 * (T2_LR - 1)) * N / 2
-    scale_LRb <- phi_a^(2 * exp_ac) * phi_b^(2 * (T2_LRb - 1)) * N / 2
-    scale_EMa <- phi_a^(exp_ac) * phi_b^(Teps) * sqrt(N / abs(rho_b) / 2)
+    scale_LRa <- phi_a^(2 * exp_ac) *
+      phi_b^(2 * (window$left + T2_LR - 1)) * original_N / 2
+    scale_LRb <- phi_a^(2 * exp_ac) *
+      phi_b^(2 * (window$left + T2_LRb - 1)) * original_N / 2
+    scale_EMa <- phi_a^(exp_ac) * phi_b^(window$left + Teps) *
+      sqrt(original_N / abs(rho_b) / 2)
     scale_EMb <- phi_a^(exp_ac) *
-      phi_b^(T2_EM - 1) *
-      sqrt(N * abs(rho_b) / 2)
+      phi_b^(window$left + T2_EM - 1) *
+      sqrt(original_N * abs(rho_b) / 2)
 
     LRa_stat <- max(statLR) / scale_LRa
     LRb_stat <- max(statLRb) / scale_LRb
@@ -359,7 +408,7 @@ cs.bubble.recovery <- function(
     cset_LRb21[T1 - 1] <- as.integer(LRb_stat < cv_LR)
   }
 
-  list(
+  sets <- list(
     cset_EMas = pmin(cset_EMa12s, cset_EMa21s),
     cset_EMbs = pmin(cset_EMb12s, cset_EMb21s),
     cset_LRa = pmin(cset_LRa12, cset_LRa21),
@@ -374,6 +423,7 @@ cs.bubble.recovery <- function(
     cset_LRb21 = cset_LRb21,
     cset_LE21 = cset_LRb21
   )
+  .bubble.pad.sets(sets, window)
 }
 
 

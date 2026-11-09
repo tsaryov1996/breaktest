@@ -9,11 +9,16 @@
 \alias{segments.NBCN}
 \title{Confidence sets for the emergence, collapse, and recovery date of a bubble}
 \usage{
-cs.bubble.emerge(y, phi_a, s2, trim = 0.1)
+cs.bubble.emerge(y, phi_a, s2, trim = 0.1, trim_endpoints = FALSE)
 
-cs.bubble.collapse(y, lambda_e, phi_a, phi_b, s2, trim = 0.1)
+cs.bubble.collapse(
+  y, lambda_e, phi_a, phi_b, s2, trim = 0.1, trim_endpoints = FALSE
+)
 
-cs.bubble.recovery(y, lambda_e, lambda_c, phi_a, phi_b, s2, trim = 0.1)
+cs.bubble.recovery(
+  y, lambda_e, lambda_c, phi_a, phi_b, s2, trim = 0.1,
+  trim_endpoints = FALSE
+)
 
 segments.AR1(y, trim = 0.1)
 
@@ -26,7 +31,15 @@ segments.NBCN(y, trim = 0.1)
 
 \item{s2}{Residual variance.}
 
-\item{trim}{Trimming parameter to exclude observations from breakpoint candidates.}
+\item{trim}{For confidence sets, the minimum separation between comparison
+dates as a fraction of the retained window length. For \code{segments.AR1} and
+\code{segments.NBCN}, the candidate-breakpoint trimming fraction.
+This is distinct from \code{trim_endpoints}.}
+
+\item{trim_endpoints}{Logical; apply the additional 5 percent trimming of
+estimated regime endpoints from Section 4 of Kurozumi and Skrobotov (2026).
+Defaults to \code{FALSE}, preserving untrimmed calculations. Supply the original,
+untrimmed two-regime window, including its initial lag observation.}
 
 \item{lambda_e}{Scalar, fraction for critical value scaling.}
 
@@ -59,6 +72,22 @@ Confidence sets for the emergence, collapse, and recovery date of a bubble
 Both the "estimated" and "true" parameter variants are handled via the \code{phi_a}, \code{phi_b}, and \code{s2} arguments,
 which are to be taken from the results of \link{segments.AR1} or \link{segments.NBCN} functions.
 
+Supply the original two-regime window with its initial lag observation:
+\code{y[1:(Tc + 1)]} for emergence, \code{y[(Te + 1):(Tr + 1)]} for collapse,
+and \code{y[(Tc + 1):(T + 1)]} for recovery, where \code{y[1]} is \code{y0}.
+
+With \code{trim_endpoints = TRUE}, \code{k = floor(0.05 * (length(y) - 1))}
+dates are removed from the right (emergence), both ends (collapse), or
+the left (recovery). The preceding lag observation is kept, and the
+statistics are recomputed on the retained window. Use \code{FALSE} for known
+regime endpoints; do not trim the input manually as well.
+
+Returned vectors keep their original lengths and indices, with zeros at
+excluded dates. Existing plotting \code{set_index} mappings therefore still apply.
+Phase-duration powers keep their original time origin. As in the untrimmed
+implementation, asymptotic scale factors use the original input-window length
+rather than a separately supplied full-sample length.
+
 \link{segments.AR1} function fits
 \deqn{y_t = \phi_1 y_{t-1} I(t \leq bp) + \phi_2 y_{t-1} I(t > bp) + e_t}
 over all candidate breakpoints in \eqn{[N \times trim, N \times (1 - trim)]}.
@@ -72,23 +101,34 @@ Then refits the 4-regime model to get \code{phi_a}, \code{phi_b}, and \code{s.sq
 }
 }
 \examples{
-fit <- segments.NBCN(y, trim = 0.1)
+set.seed(42)
+n <- 160L
+y <- numeric(n + 1L)
+y[1L] <- 10
+ar <- rep(c(1, 1.06, 0.94, 1), each = n / 4L)
+for (t in seq_len(n)) y[t + 1L] <- ar[t] * y[t] + rnorm(1)
+dates <- seq(as.Date("2000-01-01"), by = "day", length.out = n + 1L)
+trim_estimated_endpoints <- TRUE # FALSE gives the original windows
+fit <- breaktest:::segments.NBCN(y, trim = 0.1)
 estimated_dates <- c(Te = fit$Te_est, Tc = fit$Tc_est, Tr = fit$Tr_est)
 Te <- unname(estimated_dates["Te"])
 Tc <- unname(estimated_dates["Tc"])
 Tr <- unname(estimated_dates["Tr"])
 cs_e <- cs.bubble.emerge(
   y = y[seq_len(Tc + 1L)],
-  phi_a = fit$phi_a, s2 = fit$s.sq, trim = 0.1
+  phi_a = fit$phi_a, s2 = fit$s.sq, trim = 0.1,
+  trim_endpoints = trim_estimated_endpoints
 )
 cs_c <- cs.bubble.collapse(
   y = y[seq.int(Te + 1L, Tr + 1L)], lambda_e = Te / n,
-  phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1
+  phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1,
+  trim_endpoints = trim_estimated_endpoints
 )
 cs_r <- cs.bubble.recovery(
   y = y[seq.int(Tc + 1L, n + 1L)],
   lambda_e = Te / n, lambda_c = Tc / n,
-  phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1
+  phi_a = fit$phi_a, phi_b = fit$phi_b, s2 = fit$s.sq, trim = 0.1,
+  trim_endpoints = trim_estimated_endpoints
 )
 conf_sets <- list(Te = cs_e$cset_LE, Tc = cs_c$cset_EMa, Tr = cs_r$cset_LE)
 set_index <- list(
@@ -109,11 +149,11 @@ p_rows <- plot_confsets(
   date_format = "\%Y-\%m", x_label = "Date", y_label = "Time series",
   title = "Confidence sets for bubble dates"
 )
-
 }
+
 \references{
 Kurozumi, Eiji, and Anton Skrobotov. 2026.
 "Confidence Sets for the Emergence, Collapse, and Recovery Dates of a Bubble".
-arXiv:2511.16172.
-Preprint, arXiv. https://doi.org/10.48550/arXiv.2511.16172.
+Econometric Reviews, 2026, 45, 1529-1563.
+Section 4: \url{https://arxiv.org/html/2511.16172v2#S4}.
 }
