@@ -23,6 +23,25 @@ Due to the fact that this package is not in CRAN yet you need to the following.
    ```
 
 
+## Dating a single bubble
+
+`bubble.dates.NBCN()` estimates the emergence, collapse and market recovery dates.
+Use `method = "ols"` for ordinary least squares or `method = "wls"` to give
+less weight to periods of high volatility. `bubble.dates.HLZ()` estimates the
+start and end of the explosive episode from the signs of price changes. Both
+methods assume a single bubble and return its boundaries in `break.points`
+as observation positions.
+
+```r
+ols <- bubble.dates.NBCN(y, method = "ols")
+wls <- bubble.dates.NBCN(y, method = "wls")
+hlz <- bubble.dates.HLZ(y)
+```
+
+If a subsample is too short to estimate a date, NBCN reports `NA` for that
+date. When the preliminary OLS fit is incomplete, its available dates are in
+`wls$pilot$break.points`.
+
 ## Optional endpoint trimming for bubble confidence sets
 
 The three `cs.bubble.*()` functions accept `trim_endpoints = TRUE` to apply

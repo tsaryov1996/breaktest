@@ -46,6 +46,24 @@ print.bt_SADF <- function(x, ...) {
 
 
 #' @rdname print.bt_SADF
+#' @keywords internal
+#' @exportS3Method
+print.bt_bubbleDates <- function(x, ...) {
+  dates <- x$break.points
+  if (identical(x$status, "incomplete.pilot")) {
+    cat("WLS requires all three pilot dates. Available OLS dates (rows in y):\n")
+    dates <- x$pilot$break.points
+  } else {
+    cat(toupper(x$method), "bubble dates (rows in y):\n")
+  }
+  print(dates, ...)
+  if (identical(x$status, "partial")) cat(unname(x$reason), sep = "\n")
+  if (any(dates == 0L, na.rm = TRUE)) cat("Row 0 precedes the first observation.\n")
+  invisible(x)
+}
+
+
+#' @rdname print.bt_SADF
 #' @importFrom stringr str_split
 #' @keywords internal
 #' @exportS3Method

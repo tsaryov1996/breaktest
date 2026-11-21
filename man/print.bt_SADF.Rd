@@ -2,6 +2,7 @@
 % Please edit documentation in R/fn.print.R
 \name{print.bt_SADF}
 \alias{print.bt_SADF}
+\alias{print.bt_bubbleDates}
 \alias{print.bt_mdfHLT}
 \alias{print.bt_mdfHLTN}
 \alias{print.mdfCHLT}
@@ -14,6 +15,8 @@
 \title{Custom functions for printing results in a nice way.}
 \usage{
 \method{print}{bt_SADF}(x, ...)
+
+\method{print}{bt_bubbleDates}(x, ...)
 
 \method{print}{bt_mdfHLT}(obj, ...)
 
